@@ -404,11 +404,54 @@ function createCharacterPost(character: Character, activity: ParsedXiaohongshuCh
   };
 }
 
+function NoteDetailSlider({
+  note,
+  imageIds,
+  imageMap,
+}: {
+  note: XiaohongshuNote;
+  imageIds: string[];
+  imageMap: Record<string, string>;
+}) {
+  const [activeSlide, setActiveSlide] = useState(0);
+  return (
+    <div className="xhs-note-slider-container" style={getImageFrameStyle(note.imageWidth, note.imageHeight)}>
+      <div
+        className="xhs-note-slider-track"
+        onScroll={(e) => {
+          const el = e.currentTarget;
+          const index = Math.round(el.scrollLeft / (el.clientWidth || 1));
+          setActiveSlide(index);
+        }}
+      >
+        {imageIds.map((id, idx) => (
+          <div key={id || idx} className="xhs-note-slider-item">
+            {imageMap[id] ? (
+              <img src={imageMap[id]} alt={`Slide ${idx + 1}`} className="xhs-note-real-image" />
+            ) : (
+              <div className="cp-xhs-cover cp-xhs-cover--ivory" style={{ width: "100%", height: "100%" }} />
+            )}
+          </div>
+        ))}
+      </div>
+      <div className="xhs-note-slider-indicator">
+        {activeSlide + 1} / {imageIds.length}
+      </div>
+      <div className="xhs-note-slider-dots">
+        {imageIds.map((_, idx) => (
+          <span key={idx} className={`xhs-slider-dot ${idx === activeSlide ? "is-active" : ""}`} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function NoteImage({
   note,
   imageMap,
   hideTextImageDescription = false,
   collapseBilingualTranslation,
+  isDetail,
 }: {
   note: XiaohongshuNote;
   imageMap: Record<string, string>;
@@ -416,7 +459,6 @@ function NoteImage({
   collapseBilingualTranslation: boolean;
   isDetail?: boolean;
 }) {
-  const [activeSlide, setActiveSlide] = useState(0);
   const imageIds = (note.imageAssetIds && note.imageAssetIds.length > 0)
     ? note.imageAssetIds
     : (note.imageAssetId ? [note.imageAssetId] : []);
@@ -441,36 +483,7 @@ function NoteImage({
   }
   if (imageIds.length > 0 && imageIds.some(id => Boolean(imageMap[id]))) {
     if (isDetail && imageIds.length > 1) {
-      return (
-        <div className="xhs-note-slider-container" style={getImageFrameStyle(note.imageWidth, note.imageHeight)}>
-          <div
-            className="xhs-note-slider-track"
-            onScroll={(e) => {
-              const el = e.currentTarget;
-              const index = Math.round(el.scrollLeft / (el.clientWidth || 1));
-              setActiveSlide(index);
-            }}
-          >
-            {imageIds.map((id, idx) => (
-              <div key={id || idx} className="xhs-note-slider-item">
-                {imageMap[id] ? (
-                  <img src={imageMap[id]} alt={`Slide ${idx + 1}`} className="xhs-note-real-image" />
-                ) : (
-                  <div className="cp-xhs-cover cp-xhs-cover--ivory" style={{ width: "100%", height: "100%" }} />
-                )}
-              </div>
-            ))}
-          </div>
-          <div className="xhs-note-slider-indicator">
-            {activeSlide + 1} / {imageIds.length}
-          </div>
-          <div className="xhs-note-slider-dots">
-            {imageIds.map((_, idx) => (
-              <span key={idx} className={`xhs-slider-dot ${idx === activeSlide ? "is-active" : ""}`} />
-            ))}
-          </div>
-        </div>
-      );
+      return <NoteDetailSlider note={note} imageIds={imageIds} imageMap={imageMap} />;
     }
     const firstImgId = imageIds.find(id => Boolean(imageMap[id])) || imageIds[0];
     return (
