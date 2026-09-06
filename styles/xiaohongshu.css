@@ -85,6 +85,8 @@
   width: 100%;
   overflow: hidden;
   background: #000;
+  min-height: 280px;
+  max-height: 520px;
 }
 
 .xhs-note-slider-track {

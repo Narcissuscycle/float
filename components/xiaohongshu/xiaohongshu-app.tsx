@@ -1529,23 +1529,15 @@ export function XiaohongshuApp({ onClose, onNotice, visible = true, onIdle, onBu
       const objectUrl = URL.createObjectURL(file);
       image.onload = () => {
         const canvas = document.createElement("canvas");
-        const maxSize = 960;
-        const sourceWidth = image.width;
-        let sourceHeight = image.height;
-        const sourceX = 0;
-        let sourceY = 0;
-        if (sourceHeight / sourceWidth > XHS_MAX_IMAGE_HEIGHT_RATIO) {
-          sourceHeight = Math.round(sourceWidth * XHS_MAX_IMAGE_HEIGHT_RATIO);
-          sourceY = Math.round((image.height - sourceHeight) / 2);
-        }
-        let width = sourceWidth;
-        let height = sourceHeight;
+        const maxSize = 1280;
+        let width = image.width;
+        let height = image.height;
         if (width > maxSize || height > maxSize) {
           if (width > height) {
-            height = Math.round(height / width * maxSize);
+            height = Math.round((height / width) * maxSize);
             width = maxSize;
           } else {
-            width = Math.round(width / height * maxSize);
+            width = Math.round((width / height) * maxSize);
             height = maxSize;
           }
         }
@@ -1557,7 +1549,7 @@ export function XiaohongshuApp({ onClose, onNotice, visible = true, onIdle, onBu
           resolve(null);
           return;
         }
-        context.drawImage(image, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, width, height);
+        context.drawImage(image, 0, 0, image.width, image.height, 0, 0, width, height);
         canvas.toBlob((blob) => {
           URL.revokeObjectURL(objectUrl);
           if (!blob) {
